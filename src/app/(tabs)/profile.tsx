@@ -43,7 +43,8 @@ export default function ProfileScreen() {
       </Card>
 
       <Button title={`Notifications${notifications?.unreadCount ? ` (${notifications.unreadCount})` : ""}`} variant="outline" onPress={() => router.push("/notifications")} />
-      {/* Certificates arrive with Phase 5; profile edits, support and payments live on the website for now. */}
+      <Button title="Certificates" variant="outline" onPress={() => router.push("/certificates")} />
+      {/* Profile edits, support and payments live on the website for now. */}
       <Button title="Account & support on the website" variant="outline" onPress={() => void WebBrowser.openBrowserAsync(`${WEB_URL}/app/settings`)} />
       <Button title="Sign out" variant="outline" onPress={() => void signOut()} />
 

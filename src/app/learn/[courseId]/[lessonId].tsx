@@ -7,6 +7,7 @@ import { keys, useLesson } from "@/api/queries";
 import { Body, Button, Card, ErrorState, Loading, Screen, Title } from "@/components/ui";
 import type { Playback, ProgressUpdate } from "@/contracts/learning";
 import { ArticleView, EmbedVideoPlayer, ExternalPlayer, NativeVideoPlayer } from "@/features/player";
+import { QuizPanel } from "@/features/quiz";
 import { colors, space } from "@/theme/tokens";
 
 /** Lesson player (spec §22.4). Progress always comes back from the server. */
@@ -70,7 +71,9 @@ export default function LessonScreen() {
   const p = playback.data;
   const tracked = { lessonId: lesson.id, watchSessionId: session?.watchSessionId ?? null, resumeAt: session?.resumeAt ?? p?.resumeAt ?? 0, onUpdate };
   const stage =
-    !session ? (
+    lesson.type === "QUIZ" ? (
+      <QuizPanel lessonId={lesson.id} courseId={courseId} tracked={lesson.tracked} />
+    ) : !session ? (
       <Loading />
     ) : p && (p.kind === "file" || p.kind === "hls") ? (
       <NativeVideoPlayer url={p.url} {...tracked} />
@@ -82,7 +85,7 @@ export default function LessonScreen() {
       <ArticleView html={lesson.articleHtml} />
     ) : (
       <Card>
-        <Body muted>{lesson.type === "QUIZ" || lesson.type === "ASSIGNMENT" ? "Quizzes and assignments open soon." : lesson.type === "RESOURCE" ? "Open the files for this lesson from the course's Resources tab." : "The video for this lesson is still being prepared."}</Body>
+        <Body muted>{lesson.type === "ASSIGNMENT" ? "Assignments open soon." : lesson.type === "RESOURCE" ? "Open the files for this lesson from the course's Resources tab." : "The video for this lesson is still being prepared."}</Body>
       </Card>
     );
 
@@ -108,6 +111,8 @@ export default function LessonScreen() {
             <Body muted small>
               Completes automatically at {lesson.completion.videoPercent}% watched — {percent}% so far.
             </Body>
+          ) : lesson.completion.mode === "quiz" ? (
+            <Body muted small>Completes when you pass the quiz.</Body>
           ) : manual ? (
             <>
               <Button title="Mark as complete" onPress={markComplete} busy={busy} />

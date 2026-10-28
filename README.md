@@ -32,7 +32,7 @@ everywhere else.
 ## Structure (spec §23.1)
 
 ```
-src/app/            Expo Router screens
+src/app/            Expo Router screens (incl. certificates)
   _layout.tsx       providers (React Query + NetInfo, auth), protected stack
   sign-in, register, forgot-password
   (tabs)/           My learning (index), Discover, Live, Profile
@@ -42,7 +42,7 @@ src/app/            Expo Router screens
   notifications
 src/api/            fetch client (bearer, single-flight refresh, X-Client-Version) + query hooks
 src/auth/           refresh token in expo-secure-store, access token in memory (spec §23.4)
-src/features/       player (expo-video, Bunny via WebView + player.js), heartbeats (offline
+src/features/       quiz runner, certificate PDF share; player (expo-video, Bunny via WebView + player.js), heartbeats (offline
                     queue replayed with original timestamps), resources (download + share sheet)
 src/theme/          tokens mirroring the web design system
 ```
@@ -60,10 +60,15 @@ src/theme/          tokens mirroring the web design system
 
 Done: auth, My learning (dashboard), Discover, course details, player with heartbeats/resume,
 manual completion, resources (download + open), announcements, progress, live classes (join,
-recordings), notifications, account deletion. Verified with typecheck, lint and a browser run of
+recordings), notifications, account deletion, certificates, quizzes. Verified with typecheck, lint and a browser run of
 the web export (sign-in → syllabus → video completed by heartbeats → live join → profile).
 
+Phase 5: certificates screen (Profile → Certificates: download and share the PDF, share the
+verification link), quizzes inside QUIZ lessons (one scrolling page, autosave, timer with
+auto-submit, results with answers), quiz scores, remaining requirements and certificate status on
+the course Progress tab. Verified in the web export (certificate list, a graded attempt).
+
 Open: running on a device/emulator and a Maestro flow on a low-end profile (no Android SDK on the
-build machine yet), push notifications `[ENH]`, certificates (Phase 5), Play Console internal
+build machine yet), push notifications `[ENH]`, Play Console internal
 testing track, screen-capture protection `[ENH]`, Bunny HLS for `expo-video` (Bunny currently
 plays in its embedded player).

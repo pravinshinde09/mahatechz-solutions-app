@@ -179,6 +179,39 @@ function Progress({ courseId }: { courseId: string }) {
           </View>
         ))}
       </Card>
+      {data.quizzes.length ? (
+        <Card>
+          <Body style={{ fontWeight: "600" }}>Quiz scores</Body>
+          <Body muted small>
+            Verified — graded on the server. Your best attempt counts.
+          </Body>
+          {data.quizzes.map((q) => (
+            <Body key={q.id} small>
+              {q.title}: {q.bestScorePercent === null ? "not taken" : `${q.bestScorePercent}%`}
+              {q.passed ? " · passed" : ""}
+            </Body>
+          ))}
+        </Card>
+      ) : null}
+      {data.requirements.unmet.length || data.certificate.enabled ? (
+        <Card>
+          <Body style={{ fontWeight: "600" }}>{data.requirements.unmet.length ? "Still to do" : "Certificate"}</Body>
+          {data.requirements.unmet.map((u) => (
+            <Body key={u.code} small muted>
+              • {u.message}
+            </Body>
+          ))}
+          {data.certificate.enabled ? (
+            data.certificate.id ? (
+              <Button title="View your certificate" variant="outline" onPress={() => router.push("/certificates")} />
+            ) : (
+              <Body small muted>
+                {data.progress.completedAt ? "Your certificate is being prepared — we'll email you when it's issued." : "This course awards a certificate when you complete it."}
+              </Body>
+            )
+          ) : null}
+        </Card>
+      ) : null}
       <Card>
         <Body style={{ fontWeight: "600" }}>Activity</Body>
         <Body muted small>

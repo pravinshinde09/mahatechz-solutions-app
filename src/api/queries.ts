@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { z } from "zod";
+import type { QuizOverview } from "@/contracts/assessment";
 import type { CourseCard, CourseDetail } from "@/contracts/catalog";
+import type { MyCertificate } from "@/contracts/certification";
 import type { NotificationView } from "@/contracts/communication";
 import type { AnnouncementView, courseProgressSchema, Dashboard, LearnCourse, learnResourceSchema, LessonContent } from "@/contracts/learning";
 import type { LiveSessionView } from "@/contracts/live";
@@ -20,6 +22,8 @@ export const keys = {
   live: (when: string) => ["live", when] as const,
   liveSession: (id: string) => ["live-session", id] as const,
   notifications: ["notifications"] as const,
+  certificates: ["certificates"] as const,
+  quiz: (id: string) => ["quiz", id] as const,
 };
 
 /** One round trip for the "My learning" tab (spec §14.1). */
@@ -53,3 +57,8 @@ export const useNotifications = () =>
   });
 
 export const useProgress = (courseId: string) => useQuery({ queryKey: ["progress", courseId], queryFn: () => api<CourseProgress>(`/me/progress/courses/${courseId}`) });
+
+/** The student's certificates (spec §22.4 "Certificates"). */
+export const useCertificates = () => useQuery({ queryKey: keys.certificates, queryFn: () => api<MyCertificate[]>("/me/certificates") });
+
+export const useQuiz = (lessonId: string, enabled = true) => useQuery({ queryKey: keys.quiz(lessonId), queryFn: () => api<QuizOverview>(`/quizzes/${lessonId}`), enabled });

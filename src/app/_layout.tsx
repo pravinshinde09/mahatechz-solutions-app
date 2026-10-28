@@ -55,6 +55,7 @@ function RootStack() {
         <Stack.Screen name="learn/[courseId]/[lessonId]" options={{ title: "Lesson" }} />
         <Stack.Screen name="live/[id]" options={{ title: "Live class" }} />
         <Stack.Screen name="notifications" options={{ title: "Notifications" }} />
+        <Stack.Screen name="certificates" options={{ title: "Certificates" }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

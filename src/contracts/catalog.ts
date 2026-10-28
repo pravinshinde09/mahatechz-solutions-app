@@ -113,7 +113,11 @@ export const updateCourseRequestSchema = z
     enrollmentMode: enrollmentModeSchema,
     completionRule: completionRuleSchema,
     certificateEnabled: z.boolean(),
+    certificateTemplateId: z.uuid().nullable(),
     autoIssueCertificate: z.boolean(),
+    /** Appears in certificate numbers (MZT-{CODE}-{YYYY}-{NNNNNN}); null derives it from the title. */
+    certificateCode: z.string().trim().toUpperCase().regex(/^[A-Z0-9]{2,8}$/, "2–8 letters or digits").nullable(),
+    recommendedDurationDays: z.number().int().min(1).max(3650).nullable(),
     faq: faqSchema,
   })
   .partial()
@@ -202,7 +206,10 @@ export const adminCourseSchema = z.object({
   enrollmentMode: enrollmentModeSchema,
   completionRule: completionRuleSchema,
   certificateEnabled: z.boolean(),
+  certificateTemplateId: z.uuid().nullable(),
   autoIssueCertificate: z.boolean(),
+  certificateCode: z.string().nullable(),
+  recommendedDurationDays: z.number().nullable(),
   faq: faqSchema,
   estimatedDurationMinutes: z.number(),
   instructors: z.array(z.object({ userId: z.uuid(), fullName: z.string(), role: z.enum(["LEAD", "ASSISTANT"]) })),
