@@ -115,7 +115,8 @@ export default function LessonScreen() {
             <Body muted small>Completes when you pass the quiz.</Body>
           ) : manual ? (
             <>
-              <Button title="Mark as complete" onPress={markComplete} busy={busy} />
+              {/* Enabled once the server has recorded the lesson as opened (minimum time counts from then). */}
+              <Button title="Mark as complete" onPress={markComplete} busy={busy} disabled={!session} />
               {eligibleAt > now ? <Body muted small>Spend a little more time on this lesson first — about {Math.ceil((eligibleAt - now) / 60_000)} min.</Body> : null}
             </>
           ) : (

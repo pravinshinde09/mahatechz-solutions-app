@@ -68,6 +68,10 @@ verification link), quizzes inside QUIZ lessons (one scrolling page, autosave, t
 auto-submit, results with answers), quiz scores, remaining requirements and certificate status on
 the course Progress tab. Verified in the web export (certificate list, a graded attempt).
 
+Phase 6: CI (typecheck, lint, web export, gitleaks); "Mark as complete" waits for the session to
+start; Play Store release steps, listing and data safety answers in
+[docs/play-store-release.md](docs/play-store-release.md).
+
 Open: running on a device/emulator and a Maestro flow on a low-end profile (no Android SDK on the
 build machine yet), push notifications `[ENH]`, Play Console internal
 testing track, screen-capture protection `[ENH]`, Bunny HLS for `expo-video` (Bunny currently
