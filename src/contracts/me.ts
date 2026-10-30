@@ -20,14 +20,18 @@ export const meResponseSchema = z.object({
   emailVerified: z.boolean(),
   roles: z.array(roleSchema),
   permissions: z.array(z.string()),
-  twoFactorEnabled: z.boolean(),
+  /** This sign-in passed the authenticator-app step. Staff need it for every staff page. */
+  twoFactorVerified: z.boolean(),
   isStaff: z.boolean(),
   createdAt: z.iso.datetime(),
 });
 export type MeResponse = z.infer<typeof meResponseSchema>;
 
-/** Store policy + spec §18.4: re-authenticate, then a 14-day grace period. */
-export const deletionRequestSchema = z.object({ password: z.string().min(1).max(128) }).strict();
+/**
+ * Store policy + spec §18.4: re-authenticate, then a 14-day grace period. "Re-authenticate" means a
+ * sign-in (email code or Google) in the last 15 minutes; otherwise REAUTHENTICATION_REQUIRED.
+ */
+export const deletionRequestSchema = z.object({ confirm: z.literal(true) }).strict();
 export const deletionResponseSchema = z.object({ deleteOn: z.iso.datetime() });
 
 // No role/status/email fields: profile updates can never escalate privileges (T-05).

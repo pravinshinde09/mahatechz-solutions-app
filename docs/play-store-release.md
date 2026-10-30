@@ -14,9 +14,14 @@ billing requirements (spec §23.10). Keep it that way: don't add prices or links
    ```bash
    npx eas env:create --environment production --name EXPO_PUBLIC_API_URL --value https://api.<domain> --visibility plaintext
    npx eas env:create --environment preview --name EXPO_PUBLIC_API_URL --value https://api.staging.<domain> --visibility plaintext
+   # Sign-in (Supabase Auth): each environment's project URL and publishable key
+   npx eas env:create --environment production --name EXPO_PUBLIC_SUPABASE_URL --value https://<prod-ref>.supabase.co --visibility plaintext
+   npx eas env:create --environment production --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_... --visibility plaintext
    ```
 
-   `EXPO_PUBLIC_*` values are bundled into the app and visible to anyone, so only the URL goes here.
+   `EXPO_PUBLIC_*` values are bundled into the app and visible to anyone, so only URLs and the
+   publishable key go here, never Supabase's secret key. Add `mahatecz://auth-callback` to the
+   Supabase project's redirect URLs for Google sign-in.
 3. **Signing:** let EAS generate the upload key on the first build, and enrol in Play App Signing.
    Download a backup of the upload key (`npx eas credentials`) into the password manager.
 4. **Service account for `eas submit`:** Play Console → Setup → API access → create a service account

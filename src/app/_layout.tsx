@@ -60,7 +60,7 @@ function RootStack() {
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ title: "Create account" }} />
-        <Stack.Screen name="forgot-password" options={{ title: "Reset password" }} />
+        <Stack.Screen name="verify-code" options={{ title: "Enter your code" }} />
       </Stack.Protected>
     </Stack>
   );

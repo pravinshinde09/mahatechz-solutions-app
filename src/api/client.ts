@@ -1,6 +1,7 @@
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import Constants from "expo-constants";
-import type { TokenPair } from "@/contracts/auth";
 import type { ErrorCode } from "@/contracts/errors";
+import { supabase } from "@/auth/supabase";
 import { readRefreshToken, writeRefreshToken } from "@/auth/token-store";
 
 /** Android emulator reaches the host machine on 10.0.2.2. Set EXPO_PUBLIC_API_URL for devices. */
@@ -20,7 +21,12 @@ export class ApiError extends Error {
   }
 }
 
-// ───────────── tokens (spec §23.4) ─────────────
+// ───────────── tokens (spec §23.4): a Supabase session (ADR 0009 in the API repo) ─────────────
+
+export interface SessionTokens {
+  accessToken: string;
+  refreshToken: string;
+}
 
 let accessToken: string | null = null;
 let refreshing: Promise<boolean> | null = null;
@@ -33,7 +39,7 @@ export const onSessionChange = (fn: (signedIn: boolean) => void) => {
   };
 };
 
-export async function setSession(tokens: TokenPair | null) {
+export async function setSession(tokens: SessionTokens | null) {
   accessToken = tokens?.accessToken ?? null;
   await writeRefreshToken(tokens?.refreshToken ?? null);
   for (const fn of listeners) fn(!!tokens);
@@ -45,12 +51,15 @@ export function refreshSession(): Promise<boolean> {
     try {
       const refreshToken = await readRefreshToken();
       if (!refreshToken) return false;
-      const res = await raw<{ tokens: TokenPair }>("/auth/refresh", { method: "POST", body: { refreshToken } });
-      await setSession(res.tokens);
+      const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+      if (error || !data.session) {
+        // Network trouble keeps the stored token for the next try; a rejected token signs out.
+        if (!isAuthRetryableFetchError(error)) await setSession(null);
+        return false;
+      }
+      await setSession({ accessToken: data.session.access_token, refreshToken: data.session.refresh_token });
       return true;
-    } catch (err) {
-      // Network trouble keeps the stored token for the next try; a rejected token signs out.
-      if (!(err instanceof ApiError && err.code === "NETWORK_ERROR")) await setSession(null);
+    } catch {
       return false;
     } finally {
       refreshing = null;

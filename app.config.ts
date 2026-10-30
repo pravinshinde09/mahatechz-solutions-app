@@ -1,7 +1,7 @@
 import type { ExpoConfig } from "expo/config";
 
 // Env-driven config (spec §23.1). EXPO_PUBLIC_* values are inlined into the JS bundle — never put
-// secrets in them. The API URL is the only setting the app needs.
+// secrets in them. The app needs the API URL and the Supabase project URL + publishable key.
 const config: ExpoConfig = {
   name: "Mahatecz Learning",
   slug: "mahatecz-learning",

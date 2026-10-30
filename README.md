@@ -25,6 +25,8 @@ everywhere else.
 |---|---|
 | `EXPO_PUBLIC_API_URL` | API origin (default `http://10.0.2.2:4000`) |
 | `EXPO_PUBLIC_WEB_URL` | Website origin, for "manage your account on the website" |
+| `EXPO_PUBLIC_SUPABASE_URL` | Supabase project URL (sign-in, ADR 0009 in the API repo) |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The project's publishable key (public by design; never the secret key) |
 
 `npm run export:web` builds a web version that is used only for UI smoke tests in a browser
 (SecureStore and WebView have no web build; the export falls back to memory and iframes).
@@ -34,14 +36,15 @@ everywhere else.
 ```
 src/app/            Expo Router screens (incl. certificates)
   _layout.tsx       providers (React Query + NetInfo, auth), protected stack
-  sign-in, register, forgot-password
+  sign-in, register, verify-code (passwordless: emailed code or Google), auth-callback
   (tabs)/           My learning (index), Discover, Live, Profile
   course/[slug]     course details (no purchase UI)
   learn/[courseId]/ syllabus · resources · announcements · progress, and the lesson player
   live/[id]         join (opens Meet/Zoom), recording, notes
   notifications
 src/api/            fetch client (bearer, single-flight refresh, X-Client-Version) + query hooks
-src/auth/           refresh token in expo-secure-store, access token in memory (spec §23.4)
+src/auth/           Supabase client (in-memory session), refresh token in expo-secure-store,
+                    access token in memory (spec §23.4)
 src/features/       quiz runner, certificate PDF share; player (expo-video, Bunny via WebView + player.js), heartbeats (offline
                     queue replayed with original timestamps), resources (download + share sheet)
 src/theme/          tokens mirroring the web design system
@@ -52,9 +55,12 @@ src/theme/          tokens mirroring the web design system
 - Progress is server-side: the player sends heartbeats every 30 s and on pause/end; the API
   credits time against its own clock. Resume position is stored on the server, so it follows
   the student between the website and the app.
+- Sign-in is Supabase Auth: an emailed one-time code, or Google in an in-app browser that returns to
+  `mahatecz://auth-callback` (add that URL to Supabase's redirect allow list). No passwords.
 - Staff accounts are sent to the website (2FA lives there); the app is for learning.
 - Account deletion is available in Profile (store requirement): 14-day grace, cancelled by
-  signing in again.
+  signing in again. It needs a sign-in from the last 15 minutes; otherwise the app asks the user
+  to sign out and back in first.
 
 ## Status (Phase 4)
 
